@@ -473,27 +473,35 @@ export function QuizRunner({ quiz }: QuizRunnerProps) {
             {questionIndex + 1 < quiz.questions.length ? 'Next question' : 'Finish'}
           </TouchButton>
         ) : null}
+
         {feedback?.tone === 'retry' ? (
-          <TouchButton
-            variant="primary"
-            size="large"
-            onClick={() => {
-              promptShownAt.current = Date.now();
-              setRepeatedSincePrompt(false);
-              setFeedback(null);
-              setSequencePicks([]);
-              if (question.kind === 'audio-prompt') speakPrompt(question);
-            }}
-          >
-            Try again
-          </TouchButton>
-        ) : null}
-        {!feedback || feedback.tone === 'retry' ? (
-          attemptsForQuestion >= 1 ? (
-            <TouchButton variant="secondary" size="large" onClick={advance}>
-              Move on
+          <>
+            <TouchButton
+              variant="primary"
+              size="large"
+              onClick={() => {
+                promptShownAt.current = Date.now();
+                setRepeatedSincePrompt(false);
+                setFeedback(null);
+                setSequencePicks([]);
+                if (question.kind === 'audio-prompt') speakPrompt(question);
+              }}
+            >
+              Try again
             </TouchButton>
-          ) : null
+
+            {attemptsForQuestion >= 1 ? (
+              <TouchButton variant="secondary" size="large" onClick={advance}>
+                Move on
+              </TouchButton>
+            ) : null}
+          </>
+        ) : null}
+
+        {!feedback && attemptsForQuestion >= 1 ? (
+          <TouchButton variant="secondary" size="large" onClick={advance}>
+            Move on
+          </TouchButton>
         ) : null}
       </div>
     </section>
