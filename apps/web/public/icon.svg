@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Sahaj Shiksha">
+  <rect width="512" height="512" rx="96" fill="#0B4F9E" />
+  <!-- An open book with a sprouting shoot: growth through reading. -->
+  <path d="M96 176h120a48 48 0 0 1 40 22 48 48 0 0 1 40-22h120v176H296a40 40 0 0 0-40 34 40 40 0 0 0-40-34H96z"
+        fill="#FFFFFF" />
+  <path d="M256 198v188" stroke="#0B4F9E" stroke-width="16" />
+  <path d="M256 150c0-34 26-60 60-60-4 34-26 60-60 60z" fill="#FFE81A" />
+</svg>

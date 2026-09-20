@@ -1,0 +1,41 @@
+{
+  "name": "@sahaj/web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Learner-facing PWA: accessibility layer (Module 1) plus module scaffolds.",
+  "scripts": {
+    "dev": "next dev --port 3000",
+    "build": "next build",
+    "start": "next start --port 3000",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "jest --passWithNoTests",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "dependencies": {
+    "@sahaj/shared": "*",
+    "next": "16.3.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "3.3.7",
+    "@tailwindcss/postcss": "4.3.3",
+    "@testing-library/dom": "10.4.1",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.3",
+    "@testing-library/user-event": "14.6.7",
+    "@types/jest": "30.0.0",
+    "@types/node": "26.6.2",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "axe-core": "4.13.0",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "16.3.5",
+    "jest": "30.5.2",
+    "jest-environment-jsdom": "30.5.2",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3"
+  }
+}

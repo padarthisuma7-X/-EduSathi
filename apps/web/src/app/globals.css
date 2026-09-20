@@ -1,0 +1,408 @@
+@import 'tailwindcss';
+
+/* ==========================================================================
+   Sahaj Shiksha — accessible design layer
+   --------------------------------------------------------------------------
+   How theming works here (read this before editing):
+
+   1. The *authoritative* colour and typography values live in TypeScript, in
+      `@sahaj/shared/a11y`. `themeContrastReport()` recomputes every WCAG ratio
+      from those values and the Jest suite fails the build if a theme regresses.
+   2. This file does NOT duplicate the themes. `:root` carries the default
+      ("calm") values as a *no-JavaScript safety net* only. A test
+      (`src/__tests__/theme-css-parity.test.ts`) asserts those fallbacks still
+      match `THEMES.calm`, so drift cannot go unnoticed.
+   3. Everything else is expressed against `--sahaj-*` custom properties, which
+      the settings engine writes onto `<html>`. Adding a theme therefore needs no
+      CSS change at all.
+   ========================================================================== */
+
+/* Tailwind utilities bound to the runtime tokens. `@theme inline` keeps the
+   utilities pointing at the live custom property instead of copying its value,
+   which is what makes live theme switching work with no re-render. */
+@theme inline {
+  --color-canvas: var(--sahaj-bg, #ffffff);
+  --color-surface: var(--sahaj-surface, #f4f6f8);
+  --color-elevated: var(--sahaj-elevated, #ffffff);
+  --color-ink: var(--sahaj-text, #1a1a1a);
+  --color-ink-muted: var(--sahaj-text-muted, #4a4a4a);
+  --color-accent: var(--sahaj-accent, #0b4f9e);
+  --color-on-accent: var(--sahaj-on-accent, #ffffff);
+  --color-line: var(--sahaj-border, #6b7280);
+  --color-focus: var(--sahaj-focus, #a30000);
+  --color-success: var(--sahaj-success, #145c30);
+  --color-danger: var(--sahaj-danger, #9b1c1c);
+  --color-highlight: var(--sahaj-highlight-bg, #fff2a8);
+  --color-on-highlight: var(--sahaj-highlight-text, #1a1a1a);
+
+  /* Minimum touch target is a hard product requirement (WCAG 2.5.5 /
+     2.5.8): no interactive element may be smaller than this. */
+  --spacing-touch: 3rem;
+
+  --radius-control: 0.75rem;
+  --radius-card: 1.25rem;
+}
+
+/* --------------------------------------------------------------------------
+   No-JS fallback tokens (must equal THEMES.calm — enforced by a unit test)
+   -------------------------------------------------------------------------- */
+:root {
+  --sahaj-bg: #ffffff;
+  --sahaj-surface: #f4f6f8;
+  --sahaj-elevated: #ffffff;
+  --sahaj-text: #1a1a1a;
+  --sahaj-text-muted: #4a4a4a;
+  --sahaj-accent: #0b4f9e;
+  --sahaj-on-accent: #ffffff;
+  --sahaj-link: #0b4f9e;
+  --sahaj-border: #6b7280;
+  --sahaj-focus: #a30000;
+  --sahaj-success: #145c30;
+  --sahaj-danger: #9b1c1c;
+  --sahaj-highlight-bg: #fff2a8;
+  --sahaj-highlight-text: #1a1a1a;
+  --sahaj-selection-bg: #0b4f9e;
+  --sahaj-selection-text: #ffffff;
+  --sahaj-color-scheme: light;
+
+  /* Typography defaults, overridden live by the settings engine. */
+  --sahaj-font-family: 'InterVariable', 'Inter', 'Segoe UI', Roboto, system-ui, sans-serif;
+  --sahaj-font-scale: 1;
+  --sahaj-line-height: 1.6;
+  --sahaj-letter-spacing: 0.01em;
+  --sahaj-word-spacing: 0.08em;
+  --sahaj-measure: 62ch;
+  --sahaj-ruler-height: 2.2rem;
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  /* Every size in the app is rem-based, so scaling the root scales everything
+     proportionally — including buttons and spacing, which keeps layouts intact
+     at 250% text size (WCAG 1.4.4 / 1.4.10). */
+  font-size: calc(1rem * var(--sahaj-font-scale));
+  font-family: var(--sahaj-font-family);
+  line-height: var(--sahaj-line-height);
+  letter-spacing: var(--sahaj-letter-spacing);
+  word-spacing: var(--sahaj-word-spacing);
+  color-scheme: var(--sahaj-color-scheme);
+  /* Prevents the horizontal scrollbar that reflow text can create. */
+  overflow-wrap: break-word;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background-color: var(--sahaj-bg);
+  color: var(--sahaj-text);
+  min-block-size: 100svh;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background-color: var(--sahaj-selection-bg);
+  color: var(--sahaj-selection-text);
+}
+
+/* Links are never distinguished by colour alone: `emphasizeLinks` adds an
+   underline and a subtle background (WCAG 1.4.1). */
+a {
+  color: var(--sahaj-link);
+  text-decoration-skip-ink: none;
+}
+
+[data-emphasize-links='true'] a:not([data-no-emphasis]) {
+  text-decoration: underline;
+  text-decoration-thickness: 0.1em;
+  text-underline-offset: 0.18em;
+  background-color: color-mix(in oklab, var(--sahaj-highlight-bg) 45%, transparent);
+  padding-inline: 0.15em;
+  border-radius: 0.15em;
+}
+
+/* --------------------------------------------------------------------------
+   Focus visibility (WCAG 2.4.7 / 2.4.13)
+   Three signals, never colour alone: a thick outline, an offset gap, and a
+   dark/light halo so the ring survives on any card or image behind it.
+   -------------------------------------------------------------------------- */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--sahaj-focus);
+  outline-offset: 2px;
+  border-radius: 0.35rem;
+}
+
+[data-enhanced-focus='true'] :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline-width: 4px;
+  outline-offset: 3px;
+  box-shadow:
+    0 0 0 3px var(--sahaj-bg),
+    0 0 0 9px color-mix(in oklab, var(--sahaj-focus) 45%, transparent);
+}
+
+/* Keyboard-only users get the ring even in browsers that mis-detect
+   `:focus-visible` after programmatic focus moves. */
+[data-enhanced-focus='true'] :where([tabindex='-1']):focus {
+  outline: 3px dashed var(--sahaj-focus);
+  outline-offset: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   Motion
+   `data-motion="reduce"` is set by the settings engine, which resolves
+   "system" against `prefers-reduced-motion` before writing the attribute.
+   -------------------------------------------------------------------------- */
+[data-motion='reduce'] *,
+[data-motion='reduce'] *::before,
+[data-motion='reduce'] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-motion='allow']) *,
+  html:not([data-motion='allow']) *::before,
+  html:not([data-motion='allow']) *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Layout modes
+   -------------------------------------------------------------------------- */
+
+/* Zero-distraction mode: chrome stays in the DOM (so nothing is lost to
+   screen readers and nothing breaks keyboard order) but stops competing for
+   attention. */
+[data-focus-mode='true'] [data-focus-mode-hide] {
+  display: none !important;
+}
+
+[data-focus-mode='true'] [data-focus-mode-dim] {
+  opacity: 0.35;
+  filter: saturate(0.4);
+}
+
+/* Long lines are the main cause of line-skipping for dyslexic readers. */
+.sahaj-measure {
+  max-inline-size: var(--sahaj-measure);
+}
+
+.sahaj-touch-target {
+  min-block-size: var(--spacing-touch);
+  min-inline-size: var(--spacing-touch);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* --------------------------------------------------------------------------
+   Windows High Contrast / forced colors
+   Custom colours are replaced by the OS palette; we keep structure and
+   boundaries visible instead of fighting it (WCAG 1.4.3 note).
+   -------------------------------------------------------------------------- */
+@media (forced-colors: active) {
+  * {
+    forced-color-adjust: auto;
+  }
+
+  .sahaj-card,
+  button,
+  input,
+  select,
+  textarea {
+    border: 1px solid CanvasText;
+  }
+
+  :where(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 3px solid Highlight;
+  }
+}
+
+/* Requested higher contrast from the OS: strengthen separators. */
+@media (prefers-contrast: more) {
+  .sahaj-card,
+  [role='group'],
+  [data-contrast-sensitive] {
+    border-width: 2px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Component primitives
+   -------------------------------------------------------------------------- */
+.sahaj-card {
+  background-color: var(--sahaj-surface);
+  border: 1px solid var(--sahaj-border);
+  border-radius: var(--radius-card);
+}
+
+.sahaj-surface-raised {
+  background-color: var(--sahaj-elevated);
+  border: 1px solid var(--sahaj-border);
+  border-radius: var(--radius-card);
+}
+
+/* The reading surface is where the ruler, karaoke highlight and measure all
+   meet, so it owns the typography overrides rather than relying on inheritance
+   from `html` (Tailwind's `text-*` utilities would otherwise win). */
+.sahaj-prose {
+  line-height: var(--sahaj-line-height);
+  letter-spacing: var(--sahaj-letter-spacing);
+  word-spacing: var(--sahaj-word-spacing);
+  max-inline-size: var(--sahaj-measure);
+}
+
+/* Karaoke word highlight — colour AND a bottom border, so it is perceivable
+   when the learner has overridden colours or is using forced-colors. */
+.sahaj-word-active {
+  background-color: var(--sahaj-highlight-bg);
+  color: var(--sahaj-highlight-text);
+  border-block-end: 2px solid var(--sahaj-highlight-text);
+  border-radius: 0.2em;
+  padding-inline: 0.08em;
+}
+
+/* Positive reinforcement (Module 3): a single soft pop, never a flash, never a
+   sound, and never more than once per answer. Gated on motion preference —
+   under `reduce` the class is inert and the praise is text-only. */
+@media (prefers-reduced-motion: no-preference) {
+  .sahaj-reinforce {
+    animation: sahaj-reinforce-pop 420ms ease-out 1;
+  }
+  @keyframes sahaj-reinforce-pop {
+    0% {
+      transform: scale(0.98);
+      opacity: 0.4;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Range inputs
+   A native `<input type="range">` is used (keyboard and screen-reader support
+   for free) but its hit area and thumb are enlarged to the 48px standard:
+   the default 16px track is unusable for a child with a tremor.
+   -------------------------------------------------------------------------- */
+.sahaj-range {
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  min-block-size: 3rem;
+  /* `inline-size: 100%` keeps it inside the flex row next to the +/- buttons. */
+  inline-size: 100%;
+}
+
+.sahaj-range::-webkit-slider-runnable-track {
+  block-size: 0.9rem;
+  border-radius: 999px;
+  background-color: var(--sahaj-surface);
+  border: 2px solid var(--sahaj-border);
+}
+
+.sahaj-range::-webkit-slider-thumb {
+  appearance: none;
+  block-size: 2rem;
+  inline-size: 2rem;
+  margin-block-start: -0.65rem;
+  border-radius: 999px;
+  background-color: var(--sahaj-accent);
+  border: 3px solid var(--sahaj-on-accent);
+}
+
+.sahaj-range::-moz-range-track {
+  block-size: 0.9rem;
+  border-radius: 999px;
+  background-color: var(--sahaj-surface);
+  border: 2px solid var(--sahaj-border);
+}
+
+.sahaj-range::-moz-range-thumb {
+  block-size: 2rem;
+  inline-size: 2rem;
+  border-radius: 999px;
+  background-color: var(--sahaj-accent);
+  border: 3px solid var(--sahaj-on-accent);
+}
+
+.sahaj-range:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* --------------------------------------------------------------------------
+   Skip link
+   Hand-written rather than composed from `sr-only` + `focus:*` utilities: the
+   utilities fight over `position` and the clip-path reset, and the failure mode
+   (an invisible but focusable link) is exactly the bug this component exists to
+   prevent.
+   -------------------------------------------------------------------------- */
+.sahaj-skip-link {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.sahaj-skip-link:focus {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 60;
+  inline-size: auto;
+  block-size: auto;
+  padding: 0.75rem 1rem;
+  margin: 0;
+  overflow: visible;
+  clip-path: none;
+  white-space: normal;
+  border: 2px solid var(--sahaj-focus);
+  border-radius: var(--radius-control);
+  background-color: var(--sahaj-elevated);
+  color: var(--sahaj-text);
+  font-weight: 600;
+}
+
+/* Visually hidden but available to assistive technology. */
+.sahaj-sr-only {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Live regions must not be `display: none` (that silences them) nor visible
+   unless they have content worth showing, so this variant is clipped but
+   still rendered. */
+.sahaj-live-region {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}

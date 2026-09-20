@@ -1,0 +1,26 @@
+{
+  "name": "sahaj-shiksha",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Offline-first, WCAG 2.1 AAA-aimed learning platform for children with learning difficulties in low-resource schools.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "dev": "npm run dev --workspace=@sahaj/web",
+    "dev:api": "npm run dev --workspace=@sahaj/api",
+    "build": "npm run build --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "test:web": "npm run test --workspace=@sahaj/web",
+    "test:api": "npm run test --workspace=@sahaj/api",
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules apps/*/.next packages/*/dist"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

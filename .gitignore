@@ -1,0 +1,21 @@
+node_modules/
+dist/
+build/
+.next/
+out/
+coverage/
+*.tsbuildinfo
+
+.env
+.env.local
+.env.*.local
+!.env.example
+
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
+
+# Local asset stores / cached AI outputs
+.cache/
+.tmp/
